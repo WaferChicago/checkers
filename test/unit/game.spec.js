@@ -1,7 +1,9 @@
-/* eslint-disable no-unused-expressions, func-names, max-len */
+/* eslint-disable no-unused-expressions, func-names, max-len,
+no-underscore-dangle, prefer-arrow-callback */
 const expect = require('chai').expect;
 const Game = require('../../dst/models/game');
 const Player = require('../../dst/models/player');
+const sinon = require('sinon');
 
 function testStartingRow(rowNum, board) {
   const row = board[rowNum];
@@ -79,8 +81,49 @@ describe('Game', () => {
         expect(testStartingRow(6, b)).to.be.true;
         expect(testStartingRow(7, b)).to.be.true;
         expect(g.board).to.be.ok;
+        expect(g.playerTurn).to.equal('Black');
         done();
       });
     });
+  });
+  describe('.startGame', () => {
+    it('should create a game that is ready to play', sinon.test(function (done) {
+      const p1 = new Player({ name: 'p1', color: 'Red' });
+      const p2 = new Player({ name: 'p2', color: 'Black' });
+      const playerFindCB = sinon.stub(Player, 'findById');
+      playerFindCB.onCall(0).yields(null, p1);
+      playerFindCB.onCall(1).yields(null, p2);
+      Game.startGame(p1._id, p2._id, (err, game) => {
+        Player.findById.restore();
+        expect(game.board).to.be.ok;
+        expect(game.playerTurn).to.equal('Black');
+        done();
+      });
+    }));
+    // players of same color
+    it('should Not create a game when players have same color', sinon.test(function (done) {
+      const p1 = new Player({ name: 'p1', color: 'Red' });
+      const p2 = new Player({ name: 'p2', color: 'Red' });
+      const playerFindCB = this.stub(Player, 'findById');
+      playerFindCB.onCall(0).yields(null, p1);
+      playerFindCB.onCall(1).yields(null, p2);
+      Game.startGame(p1._id, p2._id, (err) => {
+        // Player.findById.restore();
+        expect(err).to.be.ok;
+        done();
+      });
+    }));
+    // player not found
+    it('should Not create a game when player id not found', sinon.test(function (done) {
+      const p1 = new Player({ name: 'p1', color: 'Red' });
+      const playerFindCB = this.stub(Player, 'findById');
+      playerFindCB.onCall(0).yields(null, p1);
+      playerFindCB.onCall(1).yields(new Error('not found'));
+      Game.startGame(p1._id, 'bad', (err) => {
+        // Player.findById.restore();
+        expect(err).to.be.ok;
+        done();
+      });
+    }));
   });
 });

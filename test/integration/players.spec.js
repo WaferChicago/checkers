@@ -3,15 +3,10 @@
 const expect = require('chai').expect;
 const request = require('supertest');
 const app = require('../../dst/server');
-const cp = require('child_process');
+// const cp = require('child_process');
 // const Player = require('../../dst/models/player');
 
 describe('player', () => {
-  beforeEach((done) => {
-    cp.execFile(`${__dirname}/../scripts/populate.sh`, { cwd: `${__dirname}/../scripts` }, () => {
-      done();
-    });
-  });
   describe('post /players', () => {
     it('should create a player', (done) => {
       request(app)
