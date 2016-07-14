@@ -20,7 +20,7 @@ describe('Player', () => {
       });
     });
     it('should not create a new player with invalid color', (done) => {
-      const p = new Player('Pedro', 'pink');
+      const p = new Player({ name: 'Pedro', color: 'pink' });
       p.validate(err => {
         expect(err).to.be.ok;
         done();

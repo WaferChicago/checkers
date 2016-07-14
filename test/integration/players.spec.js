@@ -20,7 +20,6 @@ describe('player', () => {
       .end((err, rsp) => {
         expect(err).to.be.null;
         expect(rsp.status).to.equal(200);
-        expect(rsp.body.player.__v).to.not.be.null;
         expect(rsp.body.player._id).to.not.be.null;
         done();
       });

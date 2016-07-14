@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-expressions, func-names, max-len */
 const expect = require('chai').expect;
 const Game = require('../../dst/models/game');
+const Player = require('../../dst/models/player');
+
 function testStartingRow(rowNum, board) {
   const row = board[rowNum];
   const rowIsOdd = (rowNum % 2 !== 0);
@@ -28,7 +30,9 @@ function testStartingRow(rowNum, board) {
 describe('Game', () => {
   describe('constructor', () => {
     it('should create a new Game', (done) => {
-      const g = new Game({ player1Id: '578694ff05798c1293256ce3', player2Id: '578694ff05798c1293256ce2' });
+      const p1 = new Player({ _id: '578694ff05798c1293256ce3', name: 'p1', color: 'Red' });
+      const p2 = new Player({ _id: '57869665e24ed3bd9360f3de', name: 'p2', color: 'Black' });
+      const g = new Game({ player1: p1, player2: p2 });
       g.validate(() => {
         expect(g.id).to.be.ok;
         expect(g.board).to.be.ok;
@@ -36,7 +40,7 @@ describe('Game', () => {
       });
     });
     it('should NOT create a new Game with only one registered player', (done) => {
-      const g = new Game({ player1Id: '578694ff05798c1293256ce3' });
+      const g = new Game({ player1: '578694ff05798c1293256ce3' });
       g.validate(err => {
         expect(err).to.be.ok;
         done();
@@ -45,7 +49,9 @@ describe('Game', () => {
   });
   describe('#IsDarkSquare', () => {
     it('should return true if a coordinate represents a dark square on the board', (done) => {
-      const g = new Game({ player1Id: '578694ff05798c1293256ce3', player2Id: '578694ff05798c1293256ce2' });
+      const p1 = new Player({ _id: '578694ff05798c1293256ce3', name: 'p1', color: 'Red' });
+      const p2 = new Player({ _id: '57869665e24ed3bd9360f3de', name: 'p2', color: 'Black' });
+      const g = new Game({ player1: p1, player2: p2 });
       g.setupBoard();
       g.validate(() => {
         // const b = g.board;
@@ -58,7 +64,9 @@ describe('Game', () => {
   });
   describe('#setupBoard', () => {
     it('should create a board with overlay and starting pieces', (done) => {
-      const g = new Game({ player1Id: '578694ff05798c1293256ce3', player2Id: '578694ff05798c1293256ce2' });
+      const p1 = new Player({ _id: '578694ff05798c1293256ce3', name: 'p1', color: 'Red' });
+      const p2 = new Player({ _id: '57869665e24ed3bd9360f3de', name: 'p2', color: 'Black' });
+      const g = new Game({ player1: p1, player2: p2 });
       g.setupBoard();
       g.validate(() => {
         const b = g.board;
@@ -67,7 +75,6 @@ describe('Game', () => {
         expect(testStartingRow(2, b)).to.be.true;
         expect(b[3].every(s => s === null)).to.be.true;
         expect(b[4].every(s => s === null)).to.be.true;
-        expect(testStartingRow(4, b)).to.be.true;
         expect(testStartingRow(5, b)).to.be.true;
         expect(testStartingRow(6, b)).to.be.true;
         expect(testStartingRow(7, b)).to.be.true;
