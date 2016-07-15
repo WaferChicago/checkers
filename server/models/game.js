@@ -64,7 +64,29 @@ gameSchema.methods.isDarkSquare = function (x, y) {
     }
   }
 };
+// should this be a stateless function not a instance method?
+gameSchema.methods.isValidJump = function (player, to, from) {
+  let jumpPiece = null;
+  const toPiece = this.board[to.y][to.x];
+  // console.log('player color:', player.color, 'from:', from, 'to:', to, 'to-piece:', toPiece);
+  // if black and jumping two squares diagonally and landing on unoccupied space
+  if ((player.color === 'Black') && (from.y - to.y === 2) && (toPiece === null)) {
+    jumpPiece = this.board[from.y - 1][to.x - 1];
+    // if square being jumped contains an opponent's piece
+    if ((jumpPiece !== null) && (jumpPiece.color !== player.color)) {
+      return { y: from.y - 1, x: to.x - 1 };
+    }
+  } else if ((player.color === 'Red') && (to.y - from.y === 2) && (toPiece === null)) {
+    jumpPiece = this.board[from.y + 1][to.x + 1];
+    // if square being jumped contains an opponent's piece
+    if ((jumpPiece !== null) && (jumpPiece.color !== player.color)) {
+      return { y: from.y + 1, x: to.x + 1 };
+    }
+  }
+  return null;
+};
 
+// should this be a stateless function not a instance method?
 gameSchema.methods.validateMove = function (player, to, from) {
   // invalid coordinate
   if (to.x < 0 || to.x > 7 || to.y < 0 || to.y > 7 || from.x < 0
@@ -76,14 +98,6 @@ gameSchema.methods.validateMove = function (player, to, from) {
   if (fromPiece === null) {
     return new Error('not moving an existing piece');
   }
-  // occupied space
-  if (this.board[to.y][to.x] !== null) {
-    return new Error('occupied square');
-  }
-  // more than one space
-  if (Math.abs(to.y - from.y) > 1) {
-    return new Error('can only move 1 space');
-  }
   // not forward
   if (((fromPiece.color === 'Black') && (from.y - to.y < 0)) ||
   ((fromPiece.color === 'Red') && (to.y - from.y < 0))) {
@@ -94,13 +108,22 @@ gameSchema.methods.validateMove = function (player, to, from) {
     return new Error('must remain on a dark square');
   }
   // wrong player
-  console.log('players:', player, 'playerTurn:', this.playerTurn);
   if (player.color !== this.playerTurn) {
     return new Error('not player\'s turn');
   }
   // opponent's piece
   if (fromPiece.color !== this.playerTurn) {
     return new Error('not player\'s piece');
+  }
+  if (this.isValidJump(player, to, from) === null) {
+    // occupied space
+    if (this.board[to.y][to.x] !== null) {
+      return new Error('occupied square');
+    }
+    // more than one space
+    if (Math.abs(to.y - from.y) > 1) {
+      return new Error('can only move 1 space');
+    }
   }
   return null;
 };
@@ -112,13 +135,19 @@ gameSchema.methods.newTurn = function () {
 gameSchema.methods.move = function (player, to, from, cb) {
   const error = this.validateMove(player, to, from);
   if (error !== null) {
+    console.log('Move Error:', error.message);
     return cb(error);
   }
+  const jumpPieceCoord = this.isValidJump(player, to, from);
   const p = this.board[from.y][from.x];
   this.board[to.y][to.x] = p;
   this.board[from.y][from.x] = null;
   this.newTurn();
   cb(null, this);
+  if (jumpPieceCoord !== null) {
+    this.board[jumpPieceCoord.y][jumpPieceCoord.x] = null;
+    console.log('** Removed jumped piece at:', jumpPieceCoord);
+  }
 };
 
 gameSchema.statics.getPlayer = function (pId, cb) {

@@ -31,5 +31,37 @@
         [null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}],
         [{"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null]
         ]
-      }
+      },
+      {
+        "player2": { "$oid": "01234567890123456789abc2" },
+        "player1": { "$oid": "01234567890123456789abcd" },
+        "_id": { "$oid": "5787f7a7d23f4fb0533a6974" },
+        "playerTurn": "Black",
+        "board": [
+          [null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}],
+          [{"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}, null],
+          [null, {"color": "Red", "isKinged": false}, null, null, null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}],
+          [null, null, {"color": "Red", "isKinged": false}, null, null, null, null, null],
+          [null, {"color": "Black", "isKinged": false}, null, null, null, null, null, null],
+          [null, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null],
+          [null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}],
+          [{"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null]
+          ]
+        },
+        {
+          "player2": { "$oid": "01234567890123456789abc2" },
+          "player1": { "$oid": "01234567890123456789abcd" },
+          "_id": { "$oid": "5787f7a7d23f4fb0533a6975" },
+          "playerTurn": "Red",
+          "board": [
+            [null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}],
+            [{"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}, null],
+            [null, {"color": "Red", "isKinged": false}, null, {"color": "Red", "isKinged": false}, null, null, null, {"color": "Red", "isKinged": false}],
+            [null, null, null, null, {"color": "Red", "isKinged": false}, null, null, null],
+            [null, null, null, {"color": "Black", "isKinged": false}, null, null, null, null],
+            [{"color": "Black", "isKinged": false}, null, null, null, null, null, {"color": "Black", "isKinged": false}, null],
+            [null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}],
+            [{"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null, {"color": "Black", "isKinged": false}, null]
+            ]
+          }
 ]

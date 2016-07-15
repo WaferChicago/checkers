@@ -38,7 +38,7 @@ describe('games', () => {
       });
     });
   });
-  describe('put /games/:id/move', () => {
+  describe('put /games/:id/move - standard piece', () => {
     it('should move a piece to a new coordinate', (done) => {
       request(app)
       .put('/games/5787f7a7d23f4fb0533a6972/move')
@@ -110,6 +110,49 @@ describe('games', () => {
       .end((err, rsp) => {
         expect(rsp.status).to.equal(400);
         expect(rsp.text).to.equal('not player\'s turn');
+        done();
+      });
+    });
+  });
+  describe('put /games/:id/move - jumping an opponents piece', () => {
+    it('should have a black piece jump a red piece', (done) => {
+      request(app)
+      .put('/games/5787f7a7d23f4fb0533a6974/move')
+      .send({ player: '01234567890123456789abcd', from: { y: 4, x: 1 }, to: { y: 2, x: 3 } })
+      .end((err, rsp) => {
+        expect(err).to.be.null;
+        expect(rsp.status).to.equal(200);
+        expect(rsp.body.game._id).to.not.be.null;
+        expect(rsp.body.game.playerTurn).to.equal('Red');
+        expect(rsp.body.game.board[4][1]).to.be.null;
+        expect(rsp.body.game.board[3][2]).to.be.null;
+        expect(rsp.body.game.board[2][3]).to.be.ok;
+        done();
+      });
+    });
+    it('should have a red piece jump a black piece', (done) => {
+      request(app)
+      .put('/games/5787f7a7d23f4fb0533a6975/move')
+      .send({ player: '01234567890123456789abc2', from: { y: 3, x: 4 }, to: { y: 5, x: 2 } })
+      .end((err, rsp) => {
+        expect(err).to.be.null;
+        expect(rsp.status).to.equal(200);
+        expect(rsp.body.game._id).to.not.be.null;
+        expect(rsp.body.game.playerTurn).to.equal('Black');
+        expect(rsp.body.game.board[3][4]).to.be.null;
+        expect(rsp.body.game.board[4][3]).to.be.null;
+        expect(rsp.body.game.board[5][2]).to.be.ok;
+        done();
+      });
+    });
+    it('should not have a red piece - move two spaces non-diagonally', (done) => {
+      request(app)
+      .put('/games/5787f7a7d23f4fb0533a6975/move')
+      .send({ player: '01234567890123456789abc2', from: { y: 3, x: 4 }, to: { y: 5, x: 4 } })
+      .end((err, rsp) => {
+        expect(err).to.be.null;
+        expect(rsp.status).to.equal(400);
+        expect(rsp.text).to.equal('can only move 1 space');
         done();
       });
     });
