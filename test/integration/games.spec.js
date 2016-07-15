@@ -132,27 +132,73 @@ describe('games', () => {
     });
     it('should have a red piece jump a black piece', (done) => {
       request(app)
-      .put('/games/5787f7a7d23f4fb0533a6975/move')
-      .send({ player: '01234567890123456789abc2', from: { y: 3, x: 4 }, to: { y: 5, x: 2 } })
+      .put('/games/5787f7a7d23f4fb0533a6978/move')
+      .send({ player: '01234567890123456789abc2', from: { y: 0, x: 3 }, to: { y: 2, x: 5 } })
       .end((err, rsp) => {
         expect(err).to.be.null;
         expect(rsp.status).to.equal(200);
         expect(rsp.body.game._id).to.not.be.null;
         expect(rsp.body.game.playerTurn).to.equal('Black');
-        expect(rsp.body.game.board[3][4]).to.be.null;
-        expect(rsp.body.game.board[4][3]).to.be.null;
-        expect(rsp.body.game.board[5][2]).to.be.ok;
+        expect(rsp.body.game.board[0][3]).to.be.null;
+        expect(rsp.body.game.board[1][4]).to.be.null;
+        expect(rsp.body.game.board[2][5]).to.be.ok;
         done();
       });
     });
     it('should not have a red piece - move two spaces non-diagonally', (done) => {
       request(app)
-      .put('/games/5787f7a7d23f4fb0533a6975/move')
-      .send({ player: '01234567890123456789abc2', from: { y: 3, x: 4 }, to: { y: 5, x: 4 } })
+      .put('/games/5787f7a7d23f4fb0533a6978/move')
+      .send({ player: '01234567890123456789abc2', from: { y: 0, x: 3 }, to: { y: 2, x: 1 } })
       .end((err, rsp) => {
         expect(err).to.be.null;
         expect(rsp.status).to.equal(400);
         expect(rsp.text).to.equal('can only move 1 space');
+        done();
+      });
+    });
+  });
+  describe('put /games/:id/move - kinging a piece', () => {
+    it('should have a black piece move to the kings row and be kinged', (done) => {
+      request(app)
+      .put('/games/5787f7a7d23f4fb0533a6976/move')
+      .send({ player: '01234567890123456789abcd', from: { y: 1, x: 2 }, to: { y: 0, x: 3 } })
+      .end((err, rsp) => {
+        expect(err).to.be.null;
+        expect(rsp.status).to.equal(200);
+        expect(rsp.body.game._id).to.not.be.null;
+        expect(rsp.body.game.playerTurn).to.equal('Red');
+        expect(rsp.body.game.board[1][2]).to.be.null;
+        expect(rsp.body.game.board[0][3]).to.be.ok;
+        expect(rsp.body.game.board[0][3].isKinged).to.be.true;
+        done();
+      });
+    });
+    it('should have a kinged black piece move backwards', (done) => {
+      request(app)
+      .put('/games/5787f7a7d23f4fb0533a6977/move')
+      .send({ player: '01234567890123456789abcd', from: { y: 0, x: 3 }, to: { y: 1, x: 2 } })
+      .end((err, rsp) => {
+        expect(err).to.be.null;
+        expect(rsp.status).to.equal(200);
+        expect(rsp.body.game._id).to.not.be.null;
+        expect(rsp.body.game.playerTurn).to.equal('Red');
+        expect(rsp.body.game.board[0][3]).to.be.null;
+        expect(rsp.body.game.board[1][2]).to.be.ok;
+        done();
+      });
+    });
+    it('should have a kinged black piece jump a red piece backwards', (done) => {
+      request(app)
+      .put('/games/5787f7a7d23f4fb0533a6977/move')
+      .send({ player: '01234567890123456789abcd', from: { y: 0, x: 3 }, to: { y: 2, x: 5 } })
+      .end((err, rsp) => {
+        expect(err).to.be.null;
+        expect(rsp.status).to.equal(200);
+        expect(rsp.body.game._id).to.not.be.null;
+        expect(rsp.body.game.playerTurn).to.equal('Red');
+        expect(rsp.body.game.board[0][3]).to.be.null;
+        expect(rsp.body.game.board[1][4]).to.be.null;
+        expect(rsp.body.game.board[2][5]).to.be.ok;
         done();
       });
     });

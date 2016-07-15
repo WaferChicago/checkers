@@ -67,23 +67,37 @@ gameSchema.methods.isDarkSquare = function (x, y) {
 // should this be a stateless function not a instance method?
 gameSchema.methods.isValidJump = function (player, to, from) {
   let jumpPiece = null;
+  const fromPiece = this.board[from.y][from.x];
   const toPiece = this.board[to.y][to.x];
-  // console.log('player color:', player.color, 'from:', from, 'to:', to, 'to-piece:', toPiece);
-  // if black and jumping two squares diagonally and landing on unoccupied space
-  if ((player.color === 'Black') && (from.y - to.y === 2) && (toPiece === null)) {
+  // console.log('player color:', player.color, 'from:', from, 'to:', to, 'from-piece:', fromPiece, 'to-piece:', toPiece);
+  // if black or kinged and jumping two squares diagonally and landing on unoccupied space
+  if (((player.color === 'Black') || (fromPiece.isKinged))
+  && (from.y - to.y === 2) && (toPiece === null)) {
     jumpPiece = this.board[from.y - 1][to.x - 1];
     // if square being jumped contains an opponent's piece
     if ((jumpPiece !== null) && (jumpPiece.color !== player.color)) {
       return { y: from.y - 1, x: to.x - 1 };
     }
-  } else if ((player.color === 'Red') && (to.y - from.y === 2) && (toPiece === null)) {
-    jumpPiece = this.board[from.y + 1][to.x + 1];
+  }
+  // if red or kinged and jumping two squares diagonally and landing on unoccupied space
+  if (((player.color === 'Red') || (fromPiece.isKinged))
+  && (to.y - from.y === 2) && (toPiece === null)) {
+    jumpPiece = this.board[from.y + 1][to.x - 1];
     // if square being jumped contains an opponent's piece
     if ((jumpPiece !== null) && (jumpPiece.color !== player.color)) {
-      return { y: from.y + 1, x: to.x + 1 };
+      console.log('jump piece:', { y: from.y + 1, x: to.x - 1 });
+      return { y: from.y + 1, x: to.x - 1 };
     }
   }
   return null;
+};
+
+gameSchema.methods.shouldBeKinged = function shouldBeKinged(player, to) {
+  if (((player.color === 'Black') && (to.y === 0)) ||
+  ((player.color === 'Red') && (to.y === 7))) {
+    return true;
+  }
+  return false;
 };
 
 // should this be a stateless function not a instance method?
@@ -94,13 +108,15 @@ gameSchema.methods.validateMove = function (player, to, from) {
     return new Error('invalid coordinate');
   }
   const fromPiece = this.board[from.y][from.x];
+  console.log('to:', to, 'fromPiece:', fromPiece);
   // from has a piece
   if (fromPiece === null) {
     return new Error('not moving an existing piece');
   }
   // not forward
-  if (((fromPiece.color === 'Black') && (from.y - to.y < 0)) ||
-  ((fromPiece.color === 'Red') && (to.y - from.y < 0))) {
+  if ((((fromPiece.color === 'Black') && (from.y - to.y < 0)) ||
+  ((fromPiece.color === 'Red') && (to.y - from.y < 0))) &&
+  (!fromPiece.isKinged)) {
     return new Error('cannot move backwards');
   }
   // not on black
@@ -140,14 +156,17 @@ gameSchema.methods.move = function (player, to, from, cb) {
   }
   const jumpPieceCoord = this.isValidJump(player, to, from);
   const p = this.board[from.y][from.x];
+  if (this.shouldBeKinged(player, to)) {
+    p.isKinged = true;
+  }
   this.board[to.y][to.x] = p;
   this.board[from.y][from.x] = null;
   this.newTurn();
-  cb(null, this);
   if (jumpPieceCoord !== null) {
     this.board[jumpPieceCoord.y][jumpPieceCoord.x] = null;
     console.log('** Removed jumped piece at:', jumpPieceCoord);
   }
+  cb(null, this);
 };
 
 gameSchema.statics.getPlayer = function (pId, cb) {
