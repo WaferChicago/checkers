@@ -92,7 +92,6 @@ gameSchema.methods.isValidJump = function (player, to, from) {
   let jumpPiece = null;
   const fromPiece = this.board[from.y][from.x];
   const toPiece = this.board[to.y][to.x];
-  // console.log('player color:', player.color, 'from:', from, 'to:', to, 'from-piece:', fromPiece, 'to-piece:', toPiece);
   // if black or kinged and jumping two squares diagonally and landing on unoccupied space
   if (((player.color === 'Black') || (fromPiece.isKinged))
   && (from.y - to.y === 2) && (toPiece === null)) {
@@ -205,6 +204,7 @@ gameSchema.statics.getPlayer = function (pId, cb) {
 };
 
 gameSchema.statics.startGame = function (p1Id, p2Id, cb) {
+  console.log('InStartGame:p1Id:', p1Id, ':p2Id:', p2Id);
   if (!p1Id) return cb(new Error(`Missing or invaild player1 id: \'${p1Id}\'`));
   if (!p2Id) return cb(new Error(`Missing or invaild player2 id: \'${p2Id}\'`));
   gameSchema.statics.getPlayer(p1Id, (err, player1) => {

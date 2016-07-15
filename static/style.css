@@ -1,0 +1,24 @@
+.boardsquare {
+  height: .5in;
+  width: .5in;
+  border: thin black solid;
+  float:left;
+}
+.boardrow {
+  clear: both;
+}
+.boardrow:nth-child(odd) .boardsquare:nth-child(odd) {
+  background-color: gray;
+}
+.boardrow:nth-child(even) .boardsquare:nth-child(even) {
+  background-color: gray;
+}
+.Player {
+  clear:both;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+.checker {
+  height:.4in;
+  width: .4in;
+}
