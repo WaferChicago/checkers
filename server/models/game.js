@@ -20,6 +20,7 @@ const gameSchema = new Schema({
     [{}],
   ],
   playerTurn: { type: String, enum: ['Red', 'Black'], default: 'Black' },
+  winner: { type: mongoose.Schema.ObjectId, ref: 'Player', default: null },
 });
 
 gameSchema.methods.setupBoard = function () {
@@ -44,6 +45,28 @@ gameSchema.methods.populateStartingPieces = function (y, player) {
       this.board[y][x] = p;
     }
   });
+};
+
+gameSchema.methods.allPieces = function (color) {
+  const allPlayerPieces = [];
+  this.board.forEach(row => {
+    const playerRow = row.map(square => {
+      if ((square !== null) && (square.color === color)) {
+        return square;
+      }
+      return null;
+    });
+    allPlayerPieces.push(playerRow);
+  });
+  return allPlayerPieces;
+};
+
+gameSchema.methods.gameHasWinner = function gameHasWinner(player) {
+  const enemyColor = (player.color === 'Black') ? 'Red' : 'Black';
+  const allPieces = this.allPieces(enemyColor);
+  const filteredRows = allPieces.map(row => (row.filter(square => square !== null).length));
+  const rd = filteredRows.reduce(((a, c) => a + c), 0);
+  return rd === 0;
 };
 
 gameSchema.methods.isDarkSquare = function (x, y) {
@@ -85,7 +108,6 @@ gameSchema.methods.isValidJump = function (player, to, from) {
     jumpPiece = this.board[from.y + 1][to.x - 1];
     // if square being jumped contains an opponent's piece
     if ((jumpPiece !== null) && (jumpPiece.color !== player.color)) {
-      console.log('jump piece:', { y: from.y + 1, x: to.x - 1 });
       return { y: from.y + 1, x: to.x - 1 };
     }
   }
@@ -102,13 +124,16 @@ gameSchema.methods.shouldBeKinged = function shouldBeKinged(player, to) {
 
 // should this be a stateless function not a instance method?
 gameSchema.methods.validateMove = function (player, to, from) {
+  // game has ended
+  if (this.winner !== null) {
+    return new Error('game is over');
+  }
   // invalid coordinate
   if (to.x < 0 || to.x > 7 || to.y < 0 || to.y > 7 || from.x < 0
     || from.x > 7 || from.y < 0 || from.y > 7) {
     return new Error('invalid coordinate');
   }
   const fromPiece = this.board[from.y][from.x];
-  console.log('to:', to, 'fromPiece:', fromPiece);
   // from has a piece
   if (fromPiece === null) {
     return new Error('not moving an existing piece');
@@ -165,6 +190,10 @@ gameSchema.methods.move = function (player, to, from, cb) {
   if (jumpPieceCoord !== null) {
     this.board[jumpPieceCoord.y][jumpPieceCoord.x] = null;
     console.log('** Removed jumped piece at:', jumpPieceCoord);
+  }
+  // determine winner
+  if (this.gameHasWinner(player)) {
+    this.winner = player._id;
   }
   cb(null, this);
 };

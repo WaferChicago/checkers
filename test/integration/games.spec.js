@@ -203,4 +203,47 @@ describe('games', () => {
       });
     });
   });
+  describe('put /games/:id/move - winning a game', () => {
+    it('should calculate that on completion of the turn, the opposition has no pieces and has last', (done) => {
+      request(app)
+      .put('/games/5787f7a7d23f4fb0533a6978/move')
+      .send({ player: '01234567890123456789abc2', from: { y: 0, x: 3 }, to: { y: 2, x: 5 } })
+      .end((err, rsp) => {
+        expect(err).to.be.null;
+        expect(rsp.status).to.equal(200);
+        expect(rsp.body.game._id).to.not.be.null;
+        expect(rsp.body.game.playerTurn).to.equal('Black');
+        expect(rsp.body.game.board[0][3]).to.be.null;
+        expect(rsp.body.game.board[2][5]).to.be.ok;
+        expect(rsp.body.game.winner).to.equal('01234567890123456789abc2');
+        done();
+      });
+    });
+    it('should not declare winner, the opposition has pieces', (done) => {
+      request(app)
+      .put('/games/5787f7a7d23f4fb0533a6979/move')
+      .send({ player: '01234567890123456789abc2', from: { y: 0, x: 3 }, to: { y: 2, x: 5 } })
+      .end((err, rsp) => {
+        expect(err).to.be.null;
+        expect(rsp.status).to.equal(200);
+        expect(rsp.body.game._id).to.not.be.null;
+        expect(rsp.body.game.playerTurn).to.equal('Black');
+        expect(rsp.body.game.board[0][3]).to.be.null;
+        expect(rsp.body.game.board[2][5]).to.be.ok;
+        expect(rsp.body.game.winner).to.be.null;
+        done();
+      });
+    });
+    it('should not allow a move if a winner has been declared', (done) => {
+      request(app)
+      .put('/games/5787f7a7d23f4fb0533a6980/move')
+      .send({ player: '01234567890123456789abc2', from: { y: 0, x: 3 }, to: { y: 2, x: 5 } })
+      .end((err, rsp) => {
+        expect(err).to.be.null;
+        expect(rsp.status).to.equal(400);
+        expect(rsp.text).to.equal('game is over');
+        done();
+      });
+    });
+  });
 });
