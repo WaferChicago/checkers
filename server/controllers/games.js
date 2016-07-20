@@ -8,10 +8,8 @@ import moveValidator from '../validators/games/move';
 const router = module.exports = express.Router();
 
 router.post('/', startGameValidator, (req, res) => {
-  console.log('req.body', req.body);
   Game.startGame(req.body.player1, req.body.player2, (err, game) => {
     if (err) {
-      console.log('err', err);
       return res.status(400).send(err.message);
     }
     return res.send({ game });

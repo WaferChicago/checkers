@@ -1,7 +1,8 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 
-export default () => (
-  <div className="message" >
-
+export default (props) => (
+  <div className="gameMessage" >
+    {props.message}
   </div>
 );

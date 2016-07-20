@@ -145,6 +145,20 @@ describe('games', () => {
         done();
       });
     });
+    it('should have a black piece jump a red piece from right to left', (done) => {
+      request(app)
+      .put('/games/5787f7a7d23f4fb0533a6981/move')
+      .send({ player: '01234567890123456789abcd', from: { y: 4, x: 3 }, to: { y: 2, x: 1 } })
+      .end((err, rsp) => {
+        expect(err).to.be.null;
+        expect(rsp.status).to.equal(200);
+        expect(rsp.body.game._id).to.not.be.null;
+        expect(rsp.body.game.board[4][3]).to.be.null;
+        expect(rsp.body.game.board[3][2]).to.be.null;
+        expect(rsp.body.game.board[2][1]).to.be.ok;
+        done();
+      });
+    });
     it('should not have a red piece - move two spaces non-diagonally', (done) => {
       request(app)
       .put('/games/5787f7a7d23f4fb0533a6978/move')

@@ -89,25 +89,28 @@ gameSchema.methods.isDarkSquare = function (x, y) {
 };
 // should this be a stateless function not a instance method?
 gameSchema.methods.isValidJump = function (player, to, from) {
-  let jumpPiece = null;
+  const midY = Math.floor((from.y + to.y) / 2);
+  const midX = Math.floor((from.x + to.x) / 2);
+  const jumpPiece = this.board[midY][midX];
   const fromPiece = this.board[from.y][from.x];
   const toPiece = this.board[to.y][to.x];
+  console.log('isValidJump from:', from, 'to:', to);
   // if black or kinged and jumping two squares diagonally and landing on unoccupied space
   if (((player.color === 'Black') || (fromPiece.isKinged))
   && (from.y - to.y === 2) && (toPiece === null)) {
-    jumpPiece = this.board[from.y - 1][to.x - 1];
+    console.log('isValidJump jumpPiece:', jumpPiece, 'at:', from.y - 1, to.x - 1);
     // if square being jumped contains an opponent's piece
     if ((jumpPiece !== null) && (jumpPiece.color !== player.color)) {
-      return { y: from.y - 1, x: to.x - 1 };
+      return { y: midY, x: midX };
     }
   }
   // if red or kinged and jumping two squares diagonally and landing on unoccupied space
   if (((player.color === 'Red') || (fromPiece.isKinged))
   && (to.y - from.y === 2) && (toPiece === null)) {
-    jumpPiece = this.board[from.y + 1][to.x - 1];
+    console.log('isValidJump jumpPiece:', jumpPiece);
     // if square being jumped contains an opponent's piece
     if ((jumpPiece !== null) && (jumpPiece.color !== player.color)) {
-      return { y: from.y + 1, x: to.x - 1 };
+      return { y: midY, x: midX };
     }
   }
   return null;
@@ -225,7 +228,9 @@ gameSchema.statics.startGame = function (p1Id, p2Id, cb) {
       newGame.player2 = player2;
       newGame.setupBoard();
       // save the gameSchema
-      cb(null, newGame);
+      newGame.save(() => {
+        cb(null, newGame);
+      });
     });
   });
 };

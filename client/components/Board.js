@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable react/prop-types, max-len */
 import React from 'react';
 import Square from './Square';
 
@@ -13,20 +13,19 @@ class Board extends React.Component {
   }
   componentWillReceiveProps(nextProps) {
     const board = nextProps.board;
-    console.log('props board:', board);
+    // console.log('props board:', board);
     // build def
     this.state = { board };
-    console.log('board props this.state:', this.state);
+    // console.log('board props this.state:', this.state);
   }
 
   render() {
-    console.log('board this.state:', this.state);
+    // console.log('board this.state:', this.state);
     return (
       <div className="Board" >
-        <div>Board: </div>
         {this.state.board.map((r, y) =>
           <div key={y} className="boardrow">
-            {r.map((s, x) => (<Square key={x.toString() + y.toString()} x={x} y={y} piece={s} />))}
+            {r.map((s, x) => (<Square key={x.toString() + y.toString()} x={x} y={y} piece={s} moveChecker={this.props.moveChecker} />))}
           </div>
           )
         }

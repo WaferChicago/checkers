@@ -1,6 +1,6 @@
 .boardsquare {
-  height: .5in;
-  width: .5in;
+  height: 1in;
+  width: 1in;
   border: thin black solid;
   float:left;
 }
@@ -19,6 +19,27 @@
   margin-bottom: 1em;
 }
 .checker {
-  height:.4in;
-  width: .4in;
+  height:.7in;
+  width: .7in;
+  margin-left: 15px;
+}
+.checkerKing {
+  height:.7in;
+  width: .7in;
+  margin-left: 15px;
+  border: thick green solid;
+}
+
+.emptySquare{
+  height: .7in;
+  width: .7in;
+}
+
+.gameMessage {
+  color: red;
+  font-size: 1em;
+}
+.coords{
+  font-size: 9px;
+  margin-bottom:-2px;
 }
